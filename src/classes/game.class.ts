@@ -52,6 +52,7 @@ export class Game {
   }
 
   private update(): void {
+    this.inputHandler.update();
     this.gameObjects.forEach((gameObject: GameObject) =>
       gameObject.update(this.data)
     );
