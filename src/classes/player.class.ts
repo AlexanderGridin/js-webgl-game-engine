@@ -29,7 +29,7 @@ export class Player extends GameObject {
   private collisionData!: CollisionData;
   private gameData!: SharedGameData;
 
-  private isShowHelpers = true;
+  private isShowHelpers = false;
 
   constructor(posX: number, posY: number) {
     super();
@@ -64,12 +64,8 @@ export class Player extends GameObject {
   private handleHelpers(): void {
     const { inputHandler } = this.gameData;
 
-    if (inputHandler.isKeyPressed(InputKey.X)) {
-      this.isShowHelpers = true;
-    }
-
-    if (inputHandler.isKeyPressed(InputKey.C)) {
-      this.isShowHelpers = false;
+    if (inputHandler.isKeyClicked(InputKey.X)) {
+      this.isShowHelpers = !this.isShowHelpers;
     }
   }
 
@@ -93,7 +89,7 @@ export class Player extends GameObject {
       }
     }
 
-    if (inputHandler.isKeyPressed(InputKey.G)) {
+    if (inputHandler.isKeyClicked(InputKey.G)) {
       this.angle = 0;
     }
 
