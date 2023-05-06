@@ -1,4 +1,5 @@
-import { Renderer } from "./engine/Renderer";
+import { Game } from "client-game";
 
-new Renderer();
-console.log("index.ts");
+window.addEventListener("load", () => {
+	new Game("canvas");
+});

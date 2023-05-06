@@ -1,11 +1,10 @@
-export const initRenderer = (
-	htmlElementId: string,
-	type: "webgl" | "webgl2" | "2d"
-) => {
+export type RendererType = "webgl" | "webgl2" | "2d";
+
+export const initRenderer = (htmlElementId: string, type: RendererType) => {
 	const canvas = document.getElementById(htmlElementId) as HTMLCanvasElement;
 
 	if (!canvas) {
-		return {} as any;
+		throw new Error("Canvas not found during initRenderer");
 	}
 
 	if (type === "webgl" || type === "webgl2") {
