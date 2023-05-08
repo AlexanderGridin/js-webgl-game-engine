@@ -1,7 +1,3 @@
-export interface ShaderConfig {
-	renderer: WebGLRenderingContext;
-}
-
 export class Shader {
 	private renderer!: WebGLRenderingContext;
 
@@ -9,7 +5,9 @@ export class Shader {
 	private vertexPositionRef!: any;
 	private shaderSource!: { vertex: string; fragment: string };
 
-	constructor({ renderer }: ShaderConfig) {
+	private pixelColorRef!: any;
+
+	constructor(renderer: WebGLRenderingContext) {
 		this.renderer = renderer;
 	}
 
@@ -61,6 +59,11 @@ export class Shader {
 			this.shaderProgram,
 			"aVertexPosition"
 		);
+
+		this.pixelColorRef = this.renderer.getUniformLocation(
+			this.shaderProgram,
+			"uPixelColor"
+		);
 	}
 
 	private compileShader(shaderSource: string, shaderType: number) {
@@ -92,7 +95,7 @@ export class Shader {
 		return shader;
 	}
 
-	public activate(vertexBuffer: WebGLBuffer) {
+	public activate(vertexBuffer: WebGLBuffer, pixelColor: number[]) {
 		// Identify the compiled shader to use
 		this.renderer.useProgram(this.shaderProgram);
 
@@ -109,5 +112,6 @@ export class Shader {
 		);
 
 		this.renderer.enableVertexAttribArray(this.vertexPositionRef);
+		this.renderer.uniform4fv(this.pixelColorRef, pixelColor);
 	}
 }

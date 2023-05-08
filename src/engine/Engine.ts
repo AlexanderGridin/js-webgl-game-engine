@@ -15,24 +15,23 @@ export class Engine {
 
 	constructor({ htmlCanvasId, type }: EngineConfig) {
 		this.renderer = new Renderer(htmlCanvasId, type);
-		this.shader = new Shader({ renderer: this.renderer.get() });
+		this.shader = new Shader(this.renderer.get());
 	}
 
 	public async preload() {
 		await this.shader.loadSources(
 			"glsl-shaders/square-vs.glsl",
-			"glsl-shaders/white-fs.glsl"
+			"glsl-shaders/single-color-fs.glsl"
 		);
 	}
 
-	public drawSquare() {
+	public drawSquare(color: number[]) {
 		const vertexBuffer = new VertexBuffer(this.renderer.get());
 
-		this.shader.init();
 		this.renderer
 			.useVertexBuffer(vertexBuffer)
 			.useShader(this.shader)
-			.drawSquare();
+			.drawSquare(color);
 	}
 
 	public clearCanvas() {

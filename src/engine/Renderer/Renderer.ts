@@ -26,8 +26,9 @@ export class Renderer {
 		return this;
 	}
 
-	public drawSquare() {
-		this.shader.activate(this.vertexBuffer.buffer);
+	public drawSquare(color: number[]) {
+		this.shader.init();
+		this.shader.activate(this.vertexBuffer.buffer, color);
 		this.renderer.drawArrays(this.renderer.TRIANGLE_STRIP, 0, 4);
 	}
 
