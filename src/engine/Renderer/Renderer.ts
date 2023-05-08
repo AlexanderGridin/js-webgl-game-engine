@@ -1,6 +1,6 @@
 import { Shader } from "engine/Shader";
 import { VertexBuffer } from "engine/VertexBuffer";
-import { initRenderer, RendererType } from "utils";
+import { initRenderer, RendererType } from "./utils";
 
 export class Renderer {
 	private gl!: WebGLRenderingContext;

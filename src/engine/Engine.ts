@@ -1,5 +1,5 @@
-import { RendererType } from "utils";
 import { Renderer } from "./Renderer";
+import { RendererType } from "./Renderer/utils";
 import { Shader, ShaderSource } from "./Shader";
 import { VertexBuffer } from "./VertexBuffer";
 
