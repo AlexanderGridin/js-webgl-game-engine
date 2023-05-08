@@ -1,5 +1,5 @@
 import { Engine } from "engine";
-import { convertRGBAToWebglRGBA } from "utils";
+import { color } from "./static-data";
 
 export class Game {
 	private engine!: Engine;
@@ -16,14 +16,7 @@ export class Game {
 	}
 
 	public start() {
-		this.engine.clearCanvas();
-
-		const nordBlueColor = convertRGBAToWebglRGBA({
-			red: 94,
-			green: 129,
-			blue: 172,
-		});
-
-		this.engine.drawSquare(nordBlueColor);
+		this.engine.clearCanvas(color.nord.green);
+		this.engine.drawSquare(color.nord.blue);
 	}
 }

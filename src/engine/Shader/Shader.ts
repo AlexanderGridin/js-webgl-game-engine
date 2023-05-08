@@ -1,117 +1,134 @@
+import { Renderer } from "engine/Renderer";
+
+export interface ShaderSource {
+	vertex: string;
+	fragment: string;
+}
+
 export class Shader {
-	private renderer!: WebGLRenderingContext;
+	private renderer!: Renderer;
 
-	private shaderProgram!: any;
-	private vertexPositionRef!: any;
-	private shaderSource!: { vertex: string; fragment: string };
+	private shaderSource!: ShaderSource;
+	private shaderProgram!: WebGLProgram | null;
 
-	private pixelColorRef!: any;
+	private pixelColorRef!: WebGLUniformLocation | null;
+	private vertexPositionRef!: GLint;
 
-	constructor(renderer: WebGLRenderingContext) {
+	constructor(source: ShaderSource) {
+		this.shaderSource = source;
+	}
+
+	public useRenderer(renderer: Renderer) {
 		this.renderer = renderer;
 	}
 
-	public async loadSources(vertex: string, fragmet: string): Promise<void> {
+	public static async loadSources({
+		vertex,
+		fragmet,
+	}: {
+		vertex: string;
+		fragmet: string;
+	}) {
 		const vertexResponse = await fetch(vertex);
 		const vertexText = await vertexResponse.text();
 
 		const fragmentResponse = await fetch(fragmet);
 		const fragmentText = await fragmentResponse.text();
 
-		this.shaderSource = {
+		return {
 			vertex: vertexText,
 			fragment: fragmentText,
 		};
 	}
 
 	public init() {
+		const gl = this.renderer.getGL();
+
 		// Compile vertex and fragment shaders
 		const vertexShader = this.compileShader(
 			this.shaderSource.vertex,
-			this.renderer.VERTEX_SHADER
+			gl.VERTEX_SHADER
 		);
 
 		const fragmentShader = this.compileShader(
 			this.shaderSource.fragment,
-			this.renderer.FRAGMENT_SHADER
+			gl.FRAGMENT_SHADER
 		);
 
 		// Create and link the shaders into a program.
-		this.shaderProgram = this.renderer.createProgram();
+		this.shaderProgram = gl.createProgram();
 
-		this.renderer.attachShader(this.shaderProgram, vertexShader);
-		this.renderer.attachShader(this.shaderProgram, fragmentShader);
+		if (!this.shaderProgram) {
+			throw new Error("Error during shader program creation");
+		}
 
-		this.renderer.linkProgram(this.shaderProgram);
+		gl.attachShader(this.shaderProgram, vertexShader);
+		gl.attachShader(this.shaderProgram, fragmentShader);
+
+		gl.linkProgram(this.shaderProgram);
 
 		// Check for error
-		if (
-			!this.renderer.getProgramParameter(
-				this.shaderProgram,
-				this.renderer.LINK_STATUS
-			)
-		) {
+		if (!gl.getProgramParameter(this.shaderProgram, gl.LINK_STATUS)) {
 			throw new Error("Error linking shader");
 		}
 
 		// Gets reference to aVertexPosition attribute in the shader
-		this.vertexPositionRef = this.renderer.getAttribLocation(
+		this.vertexPositionRef = gl.getAttribLocation(
 			this.shaderProgram,
 			"aVertexPosition"
 		);
 
-		this.pixelColorRef = this.renderer.getUniformLocation(
+		this.pixelColorRef = gl.getUniformLocation(
 			this.shaderProgram,
 			"uPixelColor"
 		);
 	}
 
 	private compileShader(shaderSource: string, shaderType: number) {
+		const gl = this.renderer.getGL();
 		// Create shader based on type: vertex or fragment
-		const shader = this.renderer.createShader(shaderType);
+		const shader = gl.createShader(shaderType);
 
 		if (!shader) {
 			throw new Error("Error during shader creation");
 		}
 
 		// Compile the created shader
-		this.renderer.shaderSource(shader, shaderSource);
-		this.renderer.compileShader(shader);
+		gl.shaderSource(shader, shaderSource);
+		gl.compileShader(shader);
 
 		// Check for errors and return results (null if error)
 		// The log info is how shader compilation errors are displayed.
 		// This is useful for debugging the shaders.
-		if (
-			!this.renderer.getShaderParameter(shader, this.renderer.COMPILE_STATUS)
-		) {
-			console.log(this.renderer);
+		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`A shader compiling error occured: ${this.renderer.getShaderInfoLog(
-					shader
-				)}`
+				`A shader compiling error occured: ${gl.getShaderInfoLog(shader)}`
 			);
 		}
 
 		return shader;
 	}
 
-	public activate(vertexBuffer: WebGLBuffer, pixelColor: number[]) {
+	public activate(pixelColor: number[]) {
+		const gl = this.renderer.getGL();
+		const vertexBuffer = this.renderer.getVertexBuffer();
+
 		// Identify the compiled shader to use
-		this.renderer.useProgram(this.shaderProgram);
+		gl.useProgram(this.shaderProgram);
 
 		// Bind vertex buffer to attribute defined in vertex shader
-		this.renderer.bindBuffer(this.renderer.ARRAY_BUFFER, vertexBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
-		this.renderer.vertexAttribPointer(
+		gl.vertexAttribPointer(
 			this.vertexPositionRef,
 			3, // each element is a 3-float (x,y.z)
-			this.renderer.FLOAT, // data type is FLOAT
+			gl.FLOAT, // data type is FLOAT
 			false, // if the content is normalized vectors
 			0, // number of bytes to skip in between elements
 			0 // offsets to the first element
 		);
 
-		this.renderer.enableVertexAttribArray(this.vertexPositionRef);
-		this.renderer.uniform4fv(this.pixelColorRef, pixelColor);
+		gl.enableVertexAttribArray(this.vertexPositionRef);
+		gl.uniform4fv(this.pixelColorRef, pixelColor);
 	}
 }

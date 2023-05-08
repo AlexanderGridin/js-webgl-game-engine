@@ -1,7 +1,11 @@
+import { Renderer } from "engine/Renderer";
+
 export class VertexBuffer {
 	public buffer!: WebGLBuffer;
 
-	constructor(renderer: WebGLRenderingContext) {
+	constructor(renderer: Renderer) {
+		const gl = renderer.getGL();
+
 		// x, y, z coordinate position of the vertex
 		const v1 = [0.5, 0.5, 0];
 		const v2 = [-0.5, 0.5, 0];
@@ -12,7 +16,7 @@ export class VertexBuffer {
 
 		// creates a buffer on the GPU for storing the vertex
 		// positions of the square and stores the reference to the GPU buffer
-		const buffer = renderer.createBuffer();
+		const buffer = gl.createBuffer();
 
 		if (!buffer) {
 			throw new Error("Error during VertexBuffer creating");
@@ -21,14 +25,14 @@ export class VertexBuffer {
 		this.buffer = buffer;
 
 		// activates the newly created buffer
-		renderer.bindBuffer(renderer.ARRAY_BUFFER, this.buffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
 		// loads the vertex position of the square into the activated buffer on the GPU
 		// The keyword STATIC_DRAW informs the drawing hardware that the content of this buffer will not be changed
-		renderer.bufferData(
-			renderer.ARRAY_BUFFER,
-			new Float32Array(vertices),
-			renderer.STATIC_DRAW
-		);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	}
+
+	public get() {
+		return this.buffer;
 	}
 }

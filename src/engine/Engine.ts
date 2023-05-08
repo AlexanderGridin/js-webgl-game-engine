@@ -1,7 +1,11 @@
 import { RendererType } from "utils";
 import { Renderer } from "./Renderer";
-import { Shader } from "./Shader";
+import { Shader, ShaderSource } from "./Shader";
 import { VertexBuffer } from "./VertexBuffer";
+
+interface PreloadedData {
+	shaderSource: ShaderSource;
+}
 
 export interface EngineConfig {
 	htmlCanvasId: string;
@@ -10,32 +14,31 @@ export interface EngineConfig {
 
 export class Engine {
 	private renderer!: Renderer;
-	// TODO: probably not the best approach...
-	private shader!: Shader;
+	private preloadedData: PreloadedData = {} as PreloadedData;
 
 	constructor({ htmlCanvasId, type }: EngineConfig) {
 		this.renderer = new Renderer(htmlCanvasId, type);
-		this.shader = new Shader(this.renderer.get());
 	}
 
 	public async preload() {
-		await this.shader.loadSources(
-			"glsl-shaders/square-vs.glsl",
-			"glsl-shaders/single-color-fs.glsl"
-		);
+		this.preloadedData.shaderSource = await Shader.loadSources({
+			vertex: "glsl-shaders/square-vs.glsl",
+			fragmet: "glsl-shaders/single-color-fs.glsl",
+		});
 	}
 
 	public drawSquare(color: number[]) {
-		const vertexBuffer = new VertexBuffer(this.renderer.get());
+		const vertexBuffer = new VertexBuffer(this.renderer);
+		const shader = new Shader(this.preloadedData.shaderSource);
 
 		this.renderer
 			.useVertexBuffer(vertexBuffer)
-			.useShader(this.shader)
+			.useShader(shader)
 			.drawSquare(color);
 	}
 
-	public clearCanvas() {
-		this.renderer.clear();
+	public clearCanvas(color: number[]) {
+		this.renderer.clear(color);
 	}
 
 	public useRenderer(renderer: Renderer) {

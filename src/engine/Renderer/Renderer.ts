@@ -1,23 +1,27 @@
 import { Shader } from "engine/Shader";
 import { VertexBuffer } from "engine/VertexBuffer";
-import { convertRGBAToWebglRGBA, initRenderer, RendererType } from "utils";
+import { initRenderer, RendererType } from "utils";
 
 export class Renderer {
-	private renderer!: WebGLRenderingContext;
+	private gl!: WebGLRenderingContext;
 
 	private shader!: Shader;
 	private vertexBuffer!: VertexBuffer;
 
 	constructor(htmlCanvasId: string, type: RendererType) {
-		this.renderer = initRenderer(htmlCanvasId, type) as WebGLRenderingContext;
+		this.gl = initRenderer(htmlCanvasId, type) as WebGLRenderingContext;
 	}
 
-	public get() {
-		return this.renderer;
+	public getGL() {
+		return this.gl;
 	}
 
 	public useShader(shader: Shader) {
 		this.shader = shader;
+
+		this.shader.useRenderer(this);
+		this.shader.init();
+
 		return this;
 	}
 
@@ -26,22 +30,19 @@ export class Renderer {
 		return this;
 	}
 
-	public drawSquare(color: number[]) {
-		this.shader.init();
-		this.shader.activate(this.vertexBuffer.buffer, color);
-		this.renderer.drawArrays(this.renderer.TRIANGLE_STRIP, 0, 4);
+	public getVertexBuffer() {
+		return this.vertexBuffer.get();
 	}
 
-	public clear() {
-		// const [r, g, b] = convertRGBToWebGLRGB(76, 86, 106);
-		const [r, g, b] = convertRGBAToWebglRGBA({
-			red: 164,
-			green: 190,
-			blue: 140,
-		});
-		const aplha = 1.0;
+	public drawSquare(color: number[]) {
+		this.shader.activate(color);
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+	}
 
-		this.renderer.clearColor(r, g, b, aplha);
-		this.renderer.clear(this.renderer.COLOR_BUFFER_BIT);
+	public clear(color: number[]) {
+		const [r, g, b, a] = color;
+
+		this.gl.clearColor(r, g, b, a);
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 	}
 }
