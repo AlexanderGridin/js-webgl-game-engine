@@ -13,5 +13,17 @@ export const color = {
 			green: 129,
 			blue: 172,
 		}),
+
+		pink: convertRGBAToWebglRGBA({
+			red: 174,
+			green: 137,
+			blue: 167,
+		}),
+
+		yellow: convertRGBAToWebglRGBA({
+			red: 235,
+			green: 203,
+			blue: 139,
+		}),
 	},
 };

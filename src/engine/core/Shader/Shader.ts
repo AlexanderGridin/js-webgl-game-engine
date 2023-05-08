@@ -1,4 +1,4 @@
-import { Renderer } from "engine/Renderer";
+import { WebGLRenderer } from "../WebGLRenderer";
 
 export interface ShaderSource {
 	vertex: string;
@@ -6,7 +6,7 @@ export interface ShaderSource {
 }
 
 export class Shader {
-	private renderer!: Renderer;
+	private renderer!: WebGLRenderer;
 
 	private shaderSource!: ShaderSource;
 	private shaderProgram!: WebGLProgram | null;
@@ -14,31 +14,43 @@ export class Shader {
 	private pixelColorRef!: WebGLUniformLocation | null;
 	private vertexPositionRef!: GLint;
 
-	constructor(source: ShaderSource) {
-		this.shaderSource = source;
+	constructor({
+		pathToVertexShader,
+		pathToFragmentShader,
+	}: {
+		pathToVertexShader: string;
+		pathToFragmentShader: string;
+	}) {
+		const vertexShaderText = this.loadSource(pathToVertexShader);
+		const fragmentShaderText = this.loadSource(pathToFragmentShader);
+
+		this.shaderSource = {
+			vertex: vertexShaderText,
+			fragment: fragmentShaderText,
+		};
 	}
 
-	public useRenderer(renderer: Renderer) {
+	public useRenderer(renderer: WebGLRenderer) {
 		this.renderer = renderer;
 	}
 
-	public static async loadSources({
-		vertex,
-		fragmet,
-	}: {
-		vertex: string;
-		fragmet: string;
-	}) {
-		const vertexResponse = await fetch(vertex);
-		const vertexText = await vertexResponse.text();
+	private loadSource(filePath: string) {
+		const req = new XMLHttpRequest();
+		req.open("GET", filePath, false);
 
-		const fragmentResponse = await fetch(fragmet);
-		const fragmentText = await fragmentResponse.text();
+		try {
+			req.send();
+		} catch (e) {
+			throw new Error("Error during shader source loading");
+		}
 
-		return {
-			vertex: vertexText,
-			fragment: fragmentText,
-		};
+		const shaderSource = req.responseText;
+
+		if (!shaderSource) {
+			throw new Error("Shader source loading failed");
+		}
+
+		return shaderSource;
 	}
 
 	public init() {
@@ -111,13 +123,9 @@ export class Shader {
 
 	public activate(pixelColor: number[]) {
 		const gl = this.renderer.getGL();
-		const vertexBuffer = this.renderer.getVertexBuffer();
 
 		// Identify the compiled shader to use
 		gl.useProgram(this.shaderProgram);
-
-		// Bind vertex buffer to attribute defined in vertex shader
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
 		gl.vertexAttribPointer(
 			this.vertexPositionRef,

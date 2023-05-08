@@ -7,16 +7,42 @@ export class Game {
 	constructor(htmlCanvasId: string) {
 		this.engine = new Engine({
 			htmlCanvasId,
-			type: "webgl2",
 		});
 	}
 
-	public async preload() {
-		await this.engine.preload();
+	public start() {
+		const engine = this.engine;
+
+		const blueSquare = engine.createSquare(color.nord.blue);
+		const pinkSquare = engine.createSquare(color.nord.pink);
+
+		engine.clearCanvas(color.nord.green);
+
+		pinkSquare.draw();
+		blueSquare.draw();
+
+		this.changeSquare();
 	}
 
-	public start() {
-		this.engine.clearCanvas(color.nord.green);
-		this.engine.drawSquare(color.nord.blue);
+	private changeSquare() {
+		const engine = this.engine;
+
+		setTimeout(() => {
+			engine.clearCanvas(color.nord.green);
+			const square = engine.createSquare(color.nord.pink);
+			square.draw();
+		}, 1000);
+
+		setTimeout(() => {
+			engine.clearCanvas(color.nord.green);
+			const square = engine.createSquare(color.nord.yellow);
+			square.draw();
+		}, 2000);
+
+		setTimeout(() => {
+			engine.clearCanvas(color.nord.green);
+			const square = engine.createSquare(color.nord.green);
+			square.draw();
+		}, 3000);
 	}
 }

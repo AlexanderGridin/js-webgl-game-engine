@@ -1,10 +1,15 @@
-import { Renderer } from "engine/Renderer";
+import { WebGLRenderer } from "../WebGLRenderer";
 
 export class VertexBuffer {
-	public buffer!: WebGLBuffer;
+	private buffer!: WebGLBuffer;
+	private renderer!: WebGLRenderer;
 
-	constructor(renderer: Renderer) {
-		const gl = renderer.getGL();
+	public useRenderer(renderer: WebGLRenderer) {
+		this.renderer = renderer;
+	}
+
+	public init() {
+		const gl = this.renderer.getGL();
 
 		// x, y, z coordinate position of the vertex
 		const v1 = [0.5, 0.5, 0];

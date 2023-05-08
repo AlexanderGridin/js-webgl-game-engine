@@ -1,47 +1,34 @@
-import { Renderer } from "./Renderer";
-import { RendererType } from "./Renderer/utils";
-import { Shader, ShaderSource } from "./Shader";
-import { VertexBuffer } from "./VertexBuffer";
-
-interface PreloadedData {
-	shaderSource: ShaderSource;
-}
+import { WebGLRenderer } from "./core";
+import { ShaderManager } from "./modules";
+import { Square } from "./modules/Square";
 
 export interface EngineConfig {
 	htmlCanvasId: string;
-	type: RendererType;
 }
 
 export class Engine {
-	private renderer!: Renderer;
-	private preloadedData: PreloadedData = {} as PreloadedData;
+	private renderer!: WebGLRenderer;
+	private shaderManager = new ShaderManager();
 
-	constructor({ htmlCanvasId, type }: EngineConfig) {
-		this.renderer = new Renderer(htmlCanvasId, type);
+	constructor({ htmlCanvasId }: EngineConfig) {
+		this.renderer = new WebGLRenderer(htmlCanvasId);
 	}
 
-	public async preload() {
-		this.preloadedData.shaderSource = await Shader.loadSources({
-			vertex: "glsl-shaders/square-vs.glsl",
-			fragmet: "glsl-shaders/single-color-fs.glsl",
+	public createSquare(color: number[]) {
+		const square = new Square({
+			renderer: this.renderer,
+			shader: this.shaderManager.getSingleColorShader(),
 		});
-	}
 
-	public drawSquare(color: number[]) {
-		const vertexBuffer = new VertexBuffer(this.renderer);
-		const shader = new Shader(this.preloadedData.shaderSource);
-
-		this.renderer
-			.useVertexBuffer(vertexBuffer)
-			.useShader(shader)
-			.drawSquare(color);
+		square.setColor(color);
+		return square;
 	}
 
 	public clearCanvas(color: number[]) {
 		this.renderer.clear(color);
 	}
 
-	public useRenderer(renderer: Renderer) {
+	public useRenderer(renderer: WebGLRenderer) {
 		this.renderer = renderer;
 	}
 }

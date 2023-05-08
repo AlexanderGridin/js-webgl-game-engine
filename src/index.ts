@@ -1,7 +1,6 @@
 import { Game } from "client-game";
 
-window.addEventListener("load", async () => {
+window.addEventListener("load", () => {
 	const game = new Game("canvas");
-	await game.preload();
 	game.start();
 });
