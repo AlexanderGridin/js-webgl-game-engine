@@ -43,6 +43,10 @@ module.exports = {
 				//   to: path.resolve(__dirname, "dist/assets"),
 				// },
 				{
+					from: path.resolve(__dirname, "src/glsl-shaders"),
+					to: path.resolve(__dirname, "dist/glsl-shaders"),
+				},
+				{
 					from: path.resolve(__dirname, "src/index.html"),
 					to: path.resolve(__dirname, "dist"),
 				},

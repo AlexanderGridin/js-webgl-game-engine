@@ -1,7 +1,5 @@
 export interface ShaderConfig {
 	renderer: WebGLRenderingContext;
-	vertexSource: string;
-	fragmentSource: string;
 }
 
 export class Shader {
@@ -11,18 +9,25 @@ export class Shader {
 	private vertexPositionRef!: any;
 	private shaderSource!: { vertex: string; fragment: string };
 
-	constructor({ renderer, vertexSource, fragmentSource }: ShaderConfig) {
+	constructor({ renderer }: ShaderConfig) {
 		this.renderer = renderer;
-		this.shaderSource = {
-			vertex: vertexSource,
-			fragment: fragmentSource,
-		};
-
-		this.init();
 	}
 
-	private init() {
-		// Load and compile vertex and fragment shaders
+	public async loadSources(vertex: string, fragmet: string): Promise<void> {
+		const vertexResponse = await fetch(vertex);
+		const vertexText = await vertexResponse.text();
+
+		const fragmentResponse = await fetch(fragmet);
+		const fragmentText = await fragmentResponse.text();
+
+		this.shaderSource = {
+			vertex: vertexText,
+			fragment: fragmentText,
+		};
+	}
+
+	public init() {
+		// Compile vertex and fragment shaders
 		const vertexShader = this.compileShader(
 			this.shaderSource.vertex,
 			this.renderer.VERTEX_SHADER
