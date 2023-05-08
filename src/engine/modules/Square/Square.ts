@@ -16,11 +16,11 @@ export class Square {
 		this.shader = shader;
 	}
 
-	public draw() {
+	public draw(trsMatrix: any) {
 		this.renderer.useVertexBuffer(new VertexBuffer());
 		this.renderer.useShader(this.shader);
 
-		this.shader.activate(this.color);
+		this.shader.activate(this.color, trsMatrix);
 
 		const gl = this.renderer.getGL();
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

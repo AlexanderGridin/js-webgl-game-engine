@@ -1,4 +1,5 @@
 import { Engine } from "engine";
+import { mat4, vec3 } from "gl-matrix";
 import { color } from "./static-data";
 
 export class Game {
@@ -18,31 +19,20 @@ export class Game {
 
 		engine.clearCanvas(color.nord.green);
 
-		pinkSquare.draw();
-		blueSquare.draw();
+		const trsMatrix = mat4.create();
 
-		this.changeSquare();
-	}
+		mat4.translate(trsMatrix, trsMatrix, vec3.fromValues(-0.25, 0.25, 0));
+		mat4.rotateZ(trsMatrix, trsMatrix, 0.2);
+		mat4.scale(trsMatrix, trsMatrix, vec3.fromValues(1.2, 1.2, 1.0));
 
-	private changeSquare() {
-		const engine = this.engine;
+		pinkSquare.draw(trsMatrix);
 
-		setTimeout(() => {
-			engine.clearCanvas(color.nord.green);
-			const square = engine.createSquare(color.nord.pink);
-			square.draw();
-		}, 1000);
+		mat4.identity(trsMatrix);
 
-		setTimeout(() => {
-			engine.clearCanvas(color.nord.green);
-			const square = engine.createSquare(color.nord.yellow);
-			square.draw();
-		}, 2000);
+		mat4.translate(trsMatrix, trsMatrix, vec3.fromValues(0.25, -0.25, 0));
+		mat4.rotateZ(trsMatrix, trsMatrix, -0.785); // about -45 deg
+		mat4.scale(trsMatrix, trsMatrix, vec3.fromValues(0.4, 0.4, 1.0));
 
-		setTimeout(() => {
-			engine.clearCanvas(color.nord.green);
-			const square = engine.createSquare(color.nord.green);
-			square.draw();
-		}, 3000);
+		blueSquare.draw(trsMatrix);
 	}
 }
