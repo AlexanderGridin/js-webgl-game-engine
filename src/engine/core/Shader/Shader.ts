@@ -98,7 +98,7 @@ export class Shader {
 
 		this.modelMatrixRef = gl.getUniformLocation(
 			this.shaderProgram,
-			"uModelXfromMatrix"
+			"uModelXformMatrix"
 		);
 	}
 

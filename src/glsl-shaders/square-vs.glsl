@@ -1,6 +1,7 @@
 attribute vec3 aVertexPosition;
-uniform mat4 uModelXfromMatrix;
+
+uniform mat4 uModelXformMatrix;
 
 void main(void) {
-	gl_Position = uModelXfromMatrix * vec4(aVertexPosition, 1.0);
+	gl_Position = uModelXformMatrix * vec4(aVertexPosition, 1.0);
 }
