@@ -1,5 +1,4 @@
 import { Engine } from "engine";
-import { mat4, vec3 } from "gl-matrix";
 import { color } from "./static-data";
 
 export class Game {
@@ -14,25 +13,35 @@ export class Game {
 	public start() {
 		const engine = this.engine;
 
-		const blueSquare = engine.createSquare(color.nord.blue);
+		let x = 0;
+		let bx = 0;
+		let speed = 0.005;
+		let rot = 0;
+		let brot = 0;
+
 		const pinkSquare = engine.createSquare(color.nord.pink);
+		const blueSquare = engine.createSquare(color.nord.blue);
 
-		engine.clearCanvas(color.nord.green);
+		const animate = () => {
+			engine.clearCanvas(color.nord.green);
 
-		const trsMatrix = mat4.create();
+			if (x >= 0.5 || x <= -0.5) {
+				speed *= -1;
+			}
 
-		mat4.translate(trsMatrix, trsMatrix, vec3.fromValues(-0.25, 0.25, 0));
-		mat4.rotateZ(trsMatrix, trsMatrix, 0.2);
-		mat4.scale(trsMatrix, trsMatrix, vec3.fromValues(1.2, 1.2, 1.0));
+			pinkSquare.getTransform().setPosition((x += speed), (x += speed));
+			pinkSquare.getTransform().setSize(0.4, 0.4);
+			pinkSquare.getTransform().setRotationInDeg((rot += 1));
+			pinkSquare.draw();
 
-		pinkSquare.draw(trsMatrix);
+			blueSquare.getTransform().setPosition((bx += speed), (bx += speed) * -1);
+			blueSquare.getTransform().setSize(0.3, 0.3);
+			blueSquare.getTransform().setRotationInDeg((brot -= 1));
+			blueSquare.draw();
 
-		mat4.identity(trsMatrix);
+			requestAnimationFrame(animate);
+		};
 
-		mat4.translate(trsMatrix, trsMatrix, vec3.fromValues(0.25, -0.25, 0));
-		mat4.rotateZ(trsMatrix, trsMatrix, -0.785); // about -45 deg
-		mat4.scale(trsMatrix, trsMatrix, vec3.fromValues(0.4, 0.4, 1.0));
-
-		blueSquare.draw(trsMatrix);
+		animate();
 	}
 }

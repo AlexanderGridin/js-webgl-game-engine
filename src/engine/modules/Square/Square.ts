@@ -1,4 +1,5 @@
 import { Shader, VertexBuffer, WebGLRenderer } from "engine/core";
+import { Transform } from "../Transform";
 
 export interface SquareConfig {
 	renderer: WebGLRenderer;
@@ -6,8 +7,11 @@ export interface SquareConfig {
 }
 
 export class Square {
-	private shader!: Shader;
 	private renderer!: WebGLRenderer;
+	private shader!: Shader;
+	private vertexBuffer = new VertexBuffer();
+
+	private transform = new Transform();
 
 	private color = [1, 1, 1, 1];
 
@@ -16,11 +20,11 @@ export class Square {
 		this.shader = shader;
 	}
 
-	public draw(trsMatrix: any) {
-		this.renderer.useVertexBuffer(new VertexBuffer());
+	public draw() {
+		this.renderer.useVertexBuffer(this.vertexBuffer);
 		this.renderer.useShader(this.shader);
 
-		this.shader.activate(this.color, trsMatrix);
+		this.shader.activate(this.color, this.transform.getTRSMatrix());
 
 		const gl = this.renderer.getGL();
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -32,5 +36,9 @@ export class Square {
 
 	public getColor() {
 		return this.color;
+	}
+
+	public getTransform() {
+		return this.transform;
 	}
 }
