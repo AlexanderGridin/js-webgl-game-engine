@@ -24,7 +24,11 @@ export class Square {
 		this.renderer.useVertexBuffer(this.vertexBuffer);
 		this.renderer.useShader(this.shader);
 
-		this.shader.activate(this.color, this.transform.getTRSMatrix());
+		this.shader.activate(
+			this.color,
+			this.transform.getTRSMatrix(),
+			this.renderer.getCamera().getCameraMatrix()
+		);
 
 		const gl = this.renderer.getGL();
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -32,6 +36,7 @@ export class Square {
 
 	public setColor(color: number[]) {
 		this.color = color;
+		return this;
 	}
 
 	public getColor() {

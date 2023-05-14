@@ -14,6 +14,7 @@ export class Shader {
 	private pixelColorRef!: WebGLUniformLocation | null;
 	private vertexPositionRef!: GLint;
 	private modelMatrixRef!: WebGLUniformLocation | null;
+	private cameraMatrixRef!: WebGLUniformLocation | null;
 
 	constructor({
 		pathToVertexShader,
@@ -100,6 +101,11 @@ export class Shader {
 			this.shaderProgram,
 			"uModelXformMatrix"
 		);
+
+		this.cameraMatrixRef = gl.getUniformLocation(
+			this.shaderProgram,
+			"uCameraXformMatrix"
+		);
 	}
 
 	private compileShader(shaderSource: string, shaderType: number) {
@@ -130,7 +136,7 @@ export class Shader {
 	// trsMatrix, signifies that it should be
 	// a matrix operator containing the concatenated result of
 	// translation (T), rotation (R), and scaling (S) or TRS.
-	public activate(pixelColor: number[], trsMatrix: any) {
+	public activate(pixelColor: number[], trsMatrix: any, cameraMatrix: any) {
 		const gl = this.renderer.getGL();
 
 		// Identify the compiled shader to use
@@ -148,5 +154,6 @@ export class Shader {
 		gl.enableVertexAttribArray(this.vertexPositionRef);
 		gl.uniform4fv(this.pixelColorRef, pixelColor);
 		gl.uniformMatrix4fv(this.modelMatrixRef, false, trsMatrix);
+		gl.uniformMatrix4fv(this.cameraMatrixRef, false, cameraMatrix);
 	}
 }

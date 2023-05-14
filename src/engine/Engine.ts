@@ -1,6 +1,9 @@
 import { WebGLRenderer } from "./core";
+import { Camera, CameraConfig } from "./core/Camera";
 import { ShaderManager } from "./modules";
 import { Square } from "./modules/Square";
+
+export type EngineCameraConfig = Omit<CameraConfig, "renderer">;
 
 export interface EngineConfig {
 	htmlCanvasId: string;
@@ -30,5 +33,11 @@ export class Engine {
 
 	public useRenderer(renderer: WebGLRenderer) {
 		this.renderer = renderer;
+	}
+
+	public setupCamera(config: EngineCameraConfig) {
+		const camera = new Camera({ ...config, renderer: this.renderer });
+		camera.setup();
+		this.renderer.useCamera(camera);
 	}
 }

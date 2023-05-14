@@ -1,9 +1,11 @@
+import { Camera } from "../Camera";
 import { Shader } from "../Shader";
 import { VertexBuffer } from "../VertexBuffer";
 import { WebGL } from "../WebGL";
 
 export class WebGLRenderer {
 	private gl!: WebGLRenderingContext;
+	private camera!: Camera;
 
 	constructor(htmlCanvasId: string) {
 		this.gl = new WebGL(htmlCanvasId).getGL();
@@ -38,5 +40,17 @@ export class WebGLRenderer {
 
 		this.gl.clearColor(r, g, b, a);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+	}
+
+	public useCamera(camera: Camera) {
+		this.camera = camera;
+	}
+
+	public getCamera() {
+		if (!this.camera) {
+			throw new Error("[WebGLRenderer]: Camera is not configured");
+		}
+
+		return this.camera;
 	}
 }
