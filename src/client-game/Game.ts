@@ -1,9 +1,15 @@
 import { Engine } from "engine";
+import { Scene } from "engine/core/GameLoop";
+import { Square } from "engine/modules/Square";
 import { vec2 } from "gl-matrix";
 import { color } from "./static-data";
 
-export class Game {
+export class Game implements Scene {
 	private engine!: Engine;
+	private squares: Square[] = [];
+
+	private scaleDirection = 1;
+	private moveDirection = 1;
 
 	constructor(htmlCanvasId: string) {
 		this.engine = new Engine({
@@ -11,10 +17,8 @@ export class Game {
 		});
 	}
 
-	public start() {
+	public init() {
 		const engine = this.engine;
-
-		engine.clearCanvas(color.nord.blue);
 
 		engine.setupCamera({
 			center: vec2.fromValues(20, 60),
@@ -22,37 +26,64 @@ export class Game {
 			viewport: [20, 40, 600, 300],
 		});
 
-		const blueSq = engine.createSquare([0.25, 0.25, 0.95, 1]);
+		engine.camera.setBGColor(color.nord.yellow);
 
-		blueSq.getTransform().setPosition(20, 60);
-		// blueSq.getTransform().setRotationInRad(-0.2);
-		blueSq.getTransform().setSize(5, 5);
-		blueSq.draw();
+		this.createSquares();
+	}
 
-		const redSq = engine.createSquare([1, 0.25, 0.25, 1]);
+	private createSquares() {
+		const engine = this.engine;
 
-		redSq.getTransform().setPosition(20, 60);
-		redSq.getTransform().setSize(2, 2);
-		redSq.draw();
+		const blueSq = engine.createSquare(color.nord.blue);
+		blueSq.transform.setPosition(10, 60);
+		blueSq.transform.setSize(5, 5);
 
-		const tlSq = engine.createSquare([0.9, 0.1, 0.1, 1]);
+		const redSq = engine.createSquare(color.nord.pink);
+		redSq.transform.setPosition(20, 60);
+		redSq.transform.setSize(2, 2);
 
-		tlSq.getTransform().setPosition(10, 65);
-		tlSq.draw();
+		const tlSq = engine.createSquare(color.nord.green);
+		tlSq.transform.setPosition(10, 65);
 
-		const trSq = engine.createSquare([0.1, 0.9, 0.1, 1]);
+		const trSq = engine.createSquare(color.nord.green);
+		trSq.transform.setPosition(30, 65);
 
-		trSq.getTransform().setPosition(30, 65);
-		trSq.draw();
+		const brSq = engine.createSquare(color.nord.green);
+		brSq.transform.setPosition(30, 55);
 
-		const brSq = engine.createSquare([0.1, 0.1, 0.9, 1]);
+		const blSq = engine.createSquare(color.nord.green);
+		blSq.transform.setPosition(10, 55);
 
-		brSq.getTransform().setPosition(30, 55);
-		brSq.draw();
+		this.squares.push(blueSq, redSq, tlSq, trSq, brSq, blSq);
+	}
 
-		const blSq = engine.createSquare([0.1, 0.1, 0.1, 1]);
+	public draw() {
+		const engine = this.engine;
+		engine.clearCanvas(color.nord.blue);
 
-		blSq.getTransform().setPosition(10, 55);
-		blSq.draw();
+		this.squares.forEach((square: Square) => square.draw());
+	}
+
+	public update() {
+		let delta = 0.05;
+
+		const blueSq = this.squares[0];
+		const blueSqXPos = blueSq.transform.getXPosition();
+
+		if (blueSqXPos > 30 || blueSqXPos < 10) {
+			this.moveDirection *= -1;
+		}
+
+		blueSq.transform.incXPositionBy(delta * this.moveDirection);
+		blueSq.transform.incRotationByDeg(-1 * this.moveDirection);
+
+		const redSq = this.squares[1];
+		const redSqWidth = redSq.transform.getWidth();
+
+		if (redSqWidth > 5 || redSqWidth <= 0) {
+			this.scaleDirection *= -1;
+		}
+
+		redSq.transform.incSizeBy(0.05 * this.scaleDirection);
 	}
 }

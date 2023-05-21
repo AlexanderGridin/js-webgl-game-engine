@@ -10,8 +10,16 @@ export class Transform {
 		this.setYPosition(y);
 	}
 
-	private setXPosition(x: number) {
+	public getXPosition() {
+		return this.position[0];
+	}
+
+	public setXPosition(x: number) {
 		this.position[0] = x;
+	}
+
+	public incXPositionBy(delta: number) {
+		this.setXPosition(this.getXPosition() + delta);
 	}
 
 	private setYPosition(y: number) {
@@ -27,8 +35,16 @@ export class Transform {
 		this.setHeight(height);
 	}
 
+	public getWidth() {
+		return this.scale[0];
+	}
+
 	private setWidth(width: number) {
 		this.scale[0] = width;
+	}
+
+	public getHeight() {
+		return this.scale[1];
 	}
 
 	private setHeight(height: number) {
@@ -37,6 +53,11 @@ export class Transform {
 
 	public getSize() {
 		return this.scale;
+	}
+
+	public incSizeBy(delta: number) {
+		this.setWidth(this.getWidth() + delta);
+		this.setHeight(this.getHeight() + delta);
 	}
 
 	public setRotationInRad(rotation: number) {
@@ -53,6 +74,12 @@ export class Transform {
 
 	public setRotationInDeg(rotation: number) {
 		this.setRotationInRad(rotation * (Math.PI / 180));
+	}
+
+	public incRotationByDeg(deg: number) {
+		const currentRotationInRad = this.getRotationInRad();
+		const deltaInRad = deg * (Math.PI / 180);
+		this.setRotationInRad(currentRotationInRad + deltaInRad);
 	}
 
 	public getTRSMatrix() {

@@ -81,14 +81,14 @@ export class Camera {
 	}
 
 	// TODO: possibly will be removed in the future
-	private clearViewport() {
+	public clearViewport() {
 		const gl = this.renderer.getGL();
 
 		// Set the color to be clear
 		const [r, g, b, a] = this.bgColor;
 		gl.clearColor(r, g, b, a);
 
-		// Enable scissor area, clear and the disable the scessor area
+		// Enable scissor area, clear and the disable the scissor area
 		gl.enable(gl.SCISSOR_TEST);
 		// Clear the scissor area
 		gl.clear(gl.COLOR_BUFFER_BIT);

@@ -29,6 +29,7 @@ export class Engine {
 
 	public clearCanvas(color: number[]) {
 		this.renderer.clear(color);
+		this.camera.clearViewport();
 	}
 
 	public useRenderer(renderer: WebGLRenderer) {
@@ -39,5 +40,9 @@ export class Engine {
 		const camera = new Camera({ ...config, renderer: this.renderer });
 		camera.setup();
 		this.renderer.useCamera(camera);
+	}
+
+	public get camera(): Camera {
+		return this.renderer.getCamera();
 	}
 }

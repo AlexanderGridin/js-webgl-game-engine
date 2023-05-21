@@ -11,7 +11,7 @@ export class Square {
 	private shader!: Shader;
 	private vertexBuffer = new VertexBuffer();
 
-	private transform = new Transform();
+	private _transform = new Transform();
 
 	private color = [1, 1, 1, 1];
 
@@ -26,7 +26,7 @@ export class Square {
 
 		this.shader.activate(
 			this.color,
-			this.transform.getTRSMatrix(),
+			this._transform.getTRSMatrix(),
 			this.renderer.getCamera().getCameraMatrix()
 		);
 
@@ -43,7 +43,7 @@ export class Square {
 		return this.color;
 	}
 
-	public getTransform() {
-		return this.transform;
+	public get transform() {
+		return this._transform;
 	}
 }
