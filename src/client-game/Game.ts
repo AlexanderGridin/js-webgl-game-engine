@@ -1,5 +1,6 @@
 import { Engine } from "engine";
 import { Scene } from "engine/core/GameLoop";
+import { KeyboardKey } from "engine/modules/Keyboard";
 import { Square } from "engine/modules/Square";
 import { vec2 } from "gl-matrix";
 import { color } from "./static-data";
@@ -65,6 +66,9 @@ export class Game implements Scene {
 	}
 
 	public update() {
+		// this is bad approach and need to be updated in the future
+		this.engine.keyboard.update();
+
 		let delta = 0.05;
 
 		const blueSq = this.squares[0];
@@ -74,8 +78,10 @@ export class Game implements Scene {
 			this.moveDirection *= -1;
 		}
 
-		blueSq.transform.incXPositionBy(delta * this.moveDirection);
-		blueSq.transform.incRotationByDeg(-1 * this.moveDirection);
+		if (this.engine.keyboard.isKeyPressed(KeyboardKey.ArrowRight)) {
+			blueSq.transform.incXPositionBy(delta * this.moveDirection);
+			blueSq.transform.incRotationByDeg(-1 * this.moveDirection);
+		}
 
 		const redSq = this.squares[1];
 		const redSqWidth = redSq.transform.getWidth();
@@ -84,6 +90,8 @@ export class Game implements Scene {
 			this.scaleDirection *= -1;
 		}
 
-		redSq.transform.incSizeBy(0.05 * this.scaleDirection);
+		if (this.engine.keyboard.isKeyClicked(KeyboardKey.ArrowUp)) {
+			redSq.transform.incSizeBy(0.05 * this.scaleDirection);
+		}
 	}
 }
