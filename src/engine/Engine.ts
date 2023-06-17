@@ -1,6 +1,7 @@
 import { WebGLRenderer } from "./core";
 import { Camera, CameraConfig } from "./core/Camera";
 import { ShaderManager } from "./modules";
+import { Keyboard } from "./modules/Keyboard";
 import { Square } from "./modules/Square";
 
 export type EngineCameraConfig = Omit<CameraConfig, "renderer">;
@@ -12,6 +13,7 @@ export interface EngineConfig {
 export class Engine {
 	private renderer!: WebGLRenderer;
 	private shaderManager = new ShaderManager();
+	private _keyboard = new Keyboard();
 
 	constructor({ htmlCanvasId }: EngineConfig) {
 		this.renderer = new WebGLRenderer(htmlCanvasId);
@@ -44,5 +46,9 @@ export class Engine {
 
 	public get camera(): Camera {
 		return this.renderer.getCamera();
+	}
+
+	public get keyboard(): Keyboard {
+		return this._keyboard;
 	}
 }
